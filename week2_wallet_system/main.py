@@ -62,9 +62,17 @@ class Account:
             raise InsufficientFundsError(f"You have insufficients funds to withdraw: {amount}")
         self.transactions.append(Transaction(amount,"withdraw"))
 
-#acc1 = Account("Eugine") 
-#print(acc1.owner)
-#acc1.deposit(20000)
-#acc1.withdraw(199999) 
-#print(acc1.balance())  
+
+    def __iter__(self):
+        return iter(self.transactions) # iter(self.transactions) is the 'iterator'
+
+
+acc1 = Account("Eugine") 
+print(acc1.owner)
+acc1.deposit(20000)
+acc1.withdraw(999) 
+print(acc1.balance())  
+for transaction in acc1: print(transaction) 
+
+
 
