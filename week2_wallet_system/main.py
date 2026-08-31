@@ -97,4 +97,15 @@ class Wallet:
         to_account.deposit(amount)
         
 
+ # Test example       
+pesa = Wallet()     
+account1 = Account("Eugine")
+account2 = Account("Agolla")   
+pesa.register_account(account1)
+pesa.register_account(account2)
+account1.deposit(18000)
+pesa.transfer(account1, account2, 5000)
+print(account1.balance())
+print(account2.balance())
+
 
