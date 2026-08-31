@@ -36,6 +36,7 @@ print(t1 == t2) """
 class Account:
     def __init__(self, owner):
         self.owner = owner
+        self.account_id = uuid.uuid4()
         self.transactions = [] # transactions as a list of objects
 
 
@@ -67,12 +68,33 @@ class Account:
         return iter(self.transactions) # iter(self.transactions) is the 'iterator'
 
 
-acc1 = Account("Eugine") 
+"""acc1 = Account("Eugine") 
 print(acc1.owner)
 acc1.deposit(20000)
 acc1.withdraw(999) 
 print(acc1.balance())  
-for transaction in acc1: print(transaction) 
+for transaction in acc1: print(transaction) """
 
+
+
+# Sequencing risk in transfer
+# We do withdrawal first before deposit. This ensures we don't have money moving on one side and failing on the other.
+# A case is i we do deposit first then withdrawal fails say 'InsufficientError'
+
+class Wallet:
+
+    def __init__(self):
+        self.accounts = {}
+
+
+        
+    def register_account(self,account):
+        self.accounts[account.account_id] = account
+
+
+    def transfer(self,from_account, to_account, amount):
+        from_account.withdraw(amount)
+        to_account.deposit(amount)
+        
 
 
