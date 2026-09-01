@@ -124,12 +124,59 @@ def process_payment():
     return "Success!"
 
 result = process_payment()
-print(result)
+#print(result)
     
 
+class BatchTransaction:
+    def __init__(self, account):
+        #Stores the account object that this batch will operate on.
+        self.account = account
+        self.snapshot = None
 
+    def __enter__(self):
+        
+        #Takes a point-in-time snapshot of the transactions list 
+        #and returns the account so it can be used inside the with block.
+        self.snapshot = self.account.transactions.copy()
+        return self.account
 
+    def __exit__(self, exc_type, exc_val, exc_tb):
+        
+        #Handles context cleanup. Rolls back changes if an exception occurs
+        #and propagates the error by returning False.
+       
+        if exc_type is not None:
+            # An error occurred inside the with block, roll back to the snapshot
+            print(f"[BATCH] Error detected ({exc_type.__name__}). Rolling back transactions...")
+            self.account.transactions = self.snapshot
+        else:
+            print("[BATCH] Transaction batch completed successfully.")
+            
+        # Returning False ensures the exception propagates up to be handled properly
+        return False
 
+# Test Example
+failure_account = Account("Eugine Failure")
+failure_account.deposit(5000)
+print(f"Starting Balance: Ksh {failure_account.balance()}")
+print(f"Initial Ledger State: {failure_account.transactions}")
+
+# Execute batch with an intentional failure inside a try/except to catch propagation
+try:
+    with BatchTransaction(failure_account) as acc:
+        acc.deposit(20000)
+        print(f"Mid-batch Balance (Temporary): Ksh {acc.balance()}")
+        
+        # Triggering a deliberate error
+        acc.withdraw(40000) 
+except InsufficientFundsError as e:
+    print(f"Caught Propagated Exception: {e}")
+
+#  the ledger  should successfully roll back to its exact pre-batch state
+print(f"\nPost-Failure Balance: Ksh {failure_account.balance()}")
+print("Post-Failure Ledger State:")
+for tx in failure_account:
+  print(f" - {tx}")    
 
 
  # Test example       
