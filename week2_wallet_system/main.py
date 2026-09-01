@@ -1,5 +1,6 @@
 import uuid
 import datetime
+import random
 
 
 class InvalidAmountError(Exception):
@@ -95,10 +96,44 @@ class Wallet:
     def transfer(self,from_account, to_account, amount):
         from_account.withdraw(amount)
         to_account.deposit(amount)
+
+
+def retry(func):
+    def wrapper(*args, **kwargs):
+        for attempt in range(3):
+            try:
+                return func(*args, **kwargs)
+            except Exception as e:
+                if attempt == 2:  # Last attempt
+                    print(f"[RETRY] {func.__name__} failed permanently")
+                    raise e
+                print(f"[RETRY] {func.__name__} failed, retrying...")
+
+    return wrapper
+    
+
+@retry
+def process_payment():
+    value = random.random()
+    print(f"Generated value: {value:.2f}")
+    
+    # If statement to simulate a failure condition
+    if value < 0.8:
+        raise ValueError("Value is too low! Retrying...")
         
+    return "Success!"
+
+result = process_payment()
+print(result)
+    
+
+
+
+
+
 
  # Test example       
-pesa = Wallet()     
+"""pesa = Wallet()     
 account1 = Account("Eugine")
 account2 = Account("Agolla")   
 pesa.register_account(account1)
@@ -106,6 +141,6 @@ pesa.register_account(account2)
 account1.deposit(18000)
 pesa.transfer(account1, account2, 5000)
 print(account1.balance())
-print(account2.balance())
+print(account2.balance())"""
 
 
