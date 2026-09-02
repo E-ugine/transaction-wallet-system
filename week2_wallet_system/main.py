@@ -117,7 +117,6 @@ def process_payment():
     value = random.random()
     print(f"Generated value: {value:.2f}")
     
-    # If statement to simulate a failure condition
     if value < 0.8:
         raise ValueError("Value is too low! Retrying...")
         
@@ -129,7 +128,6 @@ result = process_payment()
 
 class BatchTransaction:
     def __init__(self, account):
-        #Stores the account object that this batch will operate on.
         self.account = account
         self.snapshot = None
 
@@ -146,7 +144,6 @@ class BatchTransaction:
         #and propagates the error by returning False.
        
         if exc_type is not None:
-            # An error occurred inside the with block, roll back to the snapshot
             print(f"[BATCH] Error detected ({exc_type.__name__}). Rolling back transactions...")
             self.account.transactions = self.snapshot
         else:
@@ -172,7 +169,6 @@ try:
 except InsufficientFundsError as e:
     print(f"Caught Propagated Exception: {e}")
 
-#  the ledger  should successfully roll back to its exact pre-batch state
 print(f"\nPost-Failure Balance: Ksh {failure_account.balance()}")
 print("Post-Failure Ledger State:")
 for tx in failure_account:
