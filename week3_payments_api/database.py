@@ -6,3 +6,10 @@ engine = create_engine("sqlite:///payments.db")
 Base.metadata.create_all(engine)
 
 SessionLocal = sessionmaker(bind=engine)
+
+def get_db():
+    db = SessionLocal()
+    try:
+        yield db
+    finally:
+        db.close()
