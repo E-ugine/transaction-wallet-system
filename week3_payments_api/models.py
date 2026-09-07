@@ -28,7 +28,7 @@ class Account(Base):
         self.transactions.append(Transaction( amount,"deposit")) 
     
     
-    def balance(self):
+    def balance(self): 
         available_balance = 0
         for transaction in self.transactions:
             if transaction.transaction_type == 'deposit':
