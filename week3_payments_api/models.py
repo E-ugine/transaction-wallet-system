@@ -4,6 +4,13 @@ from sqlalchemy import String, DECIMAL, DateTime, ForeignKey
 class Base(DeclarativeBase):
     pass
 
+
+class InvalidAmountError(Exception):
+    pass
+
+class InsufficientFundsError(Exception):
+    pass
+
 class Account(Base):
     __tablename__ = "accounts"
 
@@ -14,6 +21,29 @@ class Account(Base):
 
     def __repr__(self):
         return f"Account(id = { self.id}, owner = {self.owner})"
+
+    def deposit(self, amount):
+        if amount <= 0:
+            raise InvalidAmountError(f"You can't deposit zero or a negative amount: {amount}") 
+        self.transactions.append(Transaction( amount,"deposit")) 
+    
+    
+    def balance(self):
+        available_balance = 0
+        for transaction in self.transactions:
+            if transaction.transaction_type == 'deposit':
+                available_balance += transaction.amount
+            elif transaction.transaction_type == 'withdraw':
+                available_balance -= transaction.amount
+        return available_balance
+    
+    
+    def withdraw(self, amount):  
+        if amount <= 0:
+            raise InvalidAmountError("You can't withdraw Ksh 0 or less")
+        if (amount > self.balance()):
+            raise InsufficientFundsError(f"You have insufficients funds to withdraw: {amount}")
+        self.transactions.append(Transaction(amount,"withdraw"))
 
 
 class Transaction(Base):
