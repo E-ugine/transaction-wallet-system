@@ -1,5 +1,6 @@
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column, relationship
 from sqlalchemy import String, DECIMAL, DateTime, ForeignKey
+import datetime
 
 class Base(DeclarativeBase):
     pass
@@ -25,7 +26,7 @@ class Account(Base):
     def deposit(self, amount):
         if amount <= 0:
             raise InvalidAmountError(f"You can't deposit zero or a negative amount: {amount}") 
-        self.transactions.append(Transaction( amount,"deposit")) 
+        self.transactions.append(Transaction( amount=amount,transaction_type="deposit")) 
     
     
     def balance(self): 
@@ -43,7 +44,7 @@ class Account(Base):
             raise InvalidAmountError("You can't withdraw Ksh 0 or less")
         if (amount > self.balance()):
             raise InsufficientFundsError(f"You have insufficients funds to withdraw: {amount}")
-        self.transactions.append(Transaction(amount,"withdraw"))
+        self.transactions.append(Transaction(amount=amount,transaction_type="withdraw"))
 
 
 class Transaction(Base):
@@ -52,8 +53,8 @@ class Transaction(Base):
     id : Mapped[int] = mapped_column(primary_key=True)
     amount : Mapped[DECIMAL] = mapped_column(DECIMAL(10,2))
     transaction_type : Mapped[str] = mapped_column(String(100))
-    timestamp: Mapped[DateTime] = mapped_column(DateTime(timezone=True))
-    status : Mapped[str] = mapped_column(String(100))
+    timestamp: Mapped[DateTime] = mapped_column(DateTime(timezone=True), default=datetime.datetime.now)
+    status : Mapped[str] = mapped_column(String(100), default="Pending")
 
     account_id : Mapped[int] = mapped_column(ForeignKey("accounts.id"))
     account: Mapped["Account"] = relationship(back_populates="transactions")

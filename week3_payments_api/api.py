@@ -1,7 +1,7 @@
 from fastapi import FastAPI, Depends, HTTPException
 from sqlalchemy.orm import Session
 from schema import AccountResponse,CreateAccount, DepositRequest, DepositResponse
-from models import Account
+from models import Account, InvalidAmountError
 from database import get_db
 from sqlalchemy import select
 
@@ -28,10 +28,10 @@ def make_deposit(account_id: int, amount_in : DepositRequest, db: Session = Depe
     else: 
         try:
             result.deposit(amount_in.amount)
-        except Exception as e:  
-           raise HTTPException(status_code=400, detail="Bad Request")   
-
-        db.commit()  
-    return DepositResponse(message="Deposit Successful", balance=result.balance())              
+        except InvalidAmountError:
+            raise HTTPException(status_code=400, detail="Bad Request")
+        else:
+            db.commit()  
+            return DepositResponse(message="Deposit Successful", balance=result.balance())              
     
 
