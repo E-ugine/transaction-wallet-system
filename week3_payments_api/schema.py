@@ -18,3 +18,10 @@ class DepositRequest(BaseModel):
 class DepositResponse(BaseModel):
     message : str
     balance : Decimal
+
+class WithdrawalRequest(BaseModel):
+    amount : Decimal
+
+class WithdrawalResponse(BaseModel):
+    message : str
+    balance : Decimal    
