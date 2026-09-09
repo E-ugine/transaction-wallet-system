@@ -57,7 +57,7 @@ def make_withdrawal(account_id: int, amount_in : WithdrawalRequest, db: Session=
 
 
 @app.post("/accounts/{from_account_id}/transfer", response_model=TransferResponse)
-def wire_transfer(from_account_id: int,to_account_id: int, amount_in: TransferRequest, db: Session=Depends(get_db)):
+def wire_transfer(from_account_id: int, amount_in: TransferRequest, db: Session=Depends(get_db)):
 
-     data = f"{amount_in.from_account_id}-{amount_in.to_account_id}-{amount_in.amount}"
+     data = f"{from_account_id}-{amount_in.to_account_id}-{amount_in.amount}"
      fingerprint = hashlib.sha256(data.encode()).hexdigest()
