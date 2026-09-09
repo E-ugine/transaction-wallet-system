@@ -169,11 +169,6 @@ try:
 except InsufficientFundsError as e:
     print(f"Caught Propagated Exception: {e}")
 
-print(f"\nPost-Failure Balance: Ksh {failure_account.balance()}")
-print("Post-Failure Ledger State:")
-for tx in failure_account:
-  print(f" - {tx}")    
-
 
  # Test example       
 """pesa = Wallet()     
