@@ -1,9 +1,10 @@
 from fastapi import FastAPI, Depends, HTTPException
 from sqlalchemy.orm import Session
-from schema import AccountResponse,CreateAccount, DepositRequest, DepositResponse, WithdrawalRequest, WithdrawalResponse
+from schema import AccountResponse,CreateAccount, DepositRequest, DepositResponse, WithdrawalRequest, WithdrawalResponse, TransferRequest, TransferResponse
 from models import Account, InvalidAmountError, InsufficientFundsError
 from database import get_db
 from sqlalchemy import select
+import hashlib
 
 app = FastAPI()
 
@@ -53,5 +54,10 @@ def make_withdrawal(account_id: int, amount_in : WithdrawalRequest, db: Session=
             db.commit()  
             return WithdrawalResponse(message="Withdrawal Successful", balance=result.balance()) 
 
-    
 
+
+@app.post("/accounts/{from_account_id}/transfer", response_model=TransferResponse)
+def wire_transfer(from_account_id: int,to_account_id: int, amount_in: TransferRequest, db: Session=Depends(get_db)):
+
+     data = f"{amount_in.from_account_id}-{amount_in.to_account_id}-{amount_in.amount}"
+     fingerprint = hashlib.sha256(data.encode()).hexdigest()
