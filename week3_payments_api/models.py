@@ -1,5 +1,5 @@
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column, relationship
-from sqlalchemy import String, DECIMAL, DateTime, ForeignKey
+from sqlalchemy import String, DECIMAL, DateTime, ForeignKey, Text
 import datetime
 
 class Base(DeclarativeBase):
@@ -62,3 +62,12 @@ class Transaction(Base):
     def __repr__(self):
         return f"Transaction(id = {self.id},amount={self.amount}, transaction_type={self.transaction_type}, timestamp={self.timestamp},status={self.status})"
 
+
+class IdempotencyKey(Base):
+    __tablename__ = "idempotencykeys"
+    id : Mapped[int] = mapped_column(primary_key=True)
+    key : Mapped[str] = mapped_column(String(36), unique=True)
+    status : Mapped[str] = mapped_column(String(100), default="Pending")
+    response_data : Mapped[str] = mapped_column(Text)
+    request_fingerprint : Mapped[str] = mapped_column(String(64))
+    created_at : Mapped[DateTime] = mapped_column(DateTime(timezone=True), default=datetime.datetime.now)

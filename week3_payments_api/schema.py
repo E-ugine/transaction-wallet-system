@@ -25,3 +25,12 @@ class WithdrawalRequest(BaseModel):
 class WithdrawalResponse(BaseModel):
     message : str
     balance : Decimal    
+
+class TransferRequest(BaseModel):
+    to_account_id : int    
+    amount : Decimal
+    idempotency_key : str
+
+class TransferResponse(BaseModel):
+    message: str    
+    from_balance : Decimal
