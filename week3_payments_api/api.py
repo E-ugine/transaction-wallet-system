@@ -1,6 +1,6 @@
 from fastapi import FastAPI, Depends, HTTPException
 from sqlalchemy.orm import Session
-from schema import AccountResponse,CreateAccount, DepositRequest, DepositResponse, WithdrawalRequest, WithdrawalResponse, TransferRequest, TransferResponse
+from schema import AccountResponse,CreateAccount, DepositRequest, DepositResponse, WithdrawalRequest, WithdrawalResponse, TransferRequest, TransferResponse, TransactionResponse
 from models import Account, InvalidAmountError, InsufficientFundsError, IdempotencyKey
 from database import get_db
 from sqlalchemy import select
@@ -66,7 +66,6 @@ def wire_transfer(from_account_id: int, amount_in: TransferRequest, db: Session=
 
      key_query = select(IdempotencyKey).where(IdempotencyKey.key == amount_in.idempotency_key)
      existing_key = db.execute(key_query).scalar_one_or_none()
-     print(existing_key)
 
      if existing_key is not None:
           if existing_key.request_fingerprint != fingerprint:
@@ -106,6 +105,18 @@ def wire_transfer(from_account_id: int, amount_in: TransferRequest, db: Session=
                db.refresh(transaction_key)
 
                return response
+
+
+@app.get("/accounts/{account_id}/transactions", response_model=list[TransactionResponse])          
+def list_transactions(account_id: int,transaction_type: str | None = None, db: Session=Depends(get_db)):
+     query = select(Account).where(Account.id == account_id)
+     account = db.execute(query).scalar_one_or_none()
+
+     if account is None:
+          raise HTTPException(status_code=404, detail="The account doesn't exist. Please create it first.")
+     return [t for t in account.transactions if transaction_type is None or t.transaction_type == transaction_type]
+     
+
 
 
                

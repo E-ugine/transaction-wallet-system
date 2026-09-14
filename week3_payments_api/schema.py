@@ -1,5 +1,6 @@
 from pydantic import BaseModel, Field, ConfigDict
 from decimal import Decimal
+from datetime import datetime
 
 class CreateAccount(BaseModel):
     owner: str
@@ -34,3 +35,12 @@ class TransferRequest(BaseModel):
 class TransferResponse(BaseModel):
     message: str    
     from_balance : Decimal
+
+class TransactionResponse(BaseModel):
+    id : int 
+    amount: Decimal
+    transaction_type: str
+    timestamp : datetime
+    status : str  
+
+    model_config = ConfigDict(from_attributes=True)
